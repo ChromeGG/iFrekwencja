@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl-Pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statystki - iFrekwencja</title>
+</head>
+<body>
+<h1>Twoje statystyki:</h1>
+<table border="1">
+    <tr>
+        <th>Nazwa przedmiotu</th>
+        <th>obecny</th>
+        <th>zwolniony obecny</th>
+        <th>nieobecny</th>
+        <th>nieobecny usprawiedliwiony</th>
+        <th>zwolniony</th>
+        <th>spóźniony</th>
+        <th>zajęcia nie odbyły sie</th>
+        <th>% obecności</th>
+    </tr>
+    <tr th:each="subject:${subjectList}">
+        <td th:text="${subject.name}"></td>
+        <td th:text="${subject.obecny}"></td>
+        <td th:text="${subject.zwolnionyObecny}"></td>
+        <td th:text="${subject.nieobecny}"></td>
+        <td th:text="${subject.nieobecnyUsprawiedliwiony}"></td>
+        <td th:text="${subject.zwolnienie}"></td>
+        <td th:text="${subject.spozniony}"></td>
+        <td th:text="${subject.nieOdbylySie}"></td>
+        <td th:text="${subject.frequency}"></td>
+    </tr>
+
+    <!--<tr>-->
+    <!--<td colspan="3"/>-->
+    <!--<td> th:text="${#math.sum(product.paidService.![price])}" /></td>-->
+    <!--</tr>-->
+
+</table>
+<a th:href="@{/}">Homepage</a>
+</body>
+</html>
