@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.User;
-import com.example.phantomJsController.PhantomJSController;
+import com.example.dataSupplier.PhantomJSController;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,8 +24,8 @@ public class HomeController {
 
     @GetMapping
     public String home(Model model) {
-        phantomController.createNewConnection();
-        BufferedImage captcha = phantomController.getCaptcha();
+        phantomController.setupNewConnection();
+        BufferedImage captcha = phantomController.getCaptchaImage();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStream b64 = new Base64OutputStream(baos);

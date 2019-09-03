@@ -1,4 +1,4 @@
-package com.example.phantomJsController;
+package com.example.dataSupplier;
 
 import com.example.model.Subject;
 import com.example.model.User;
@@ -17,14 +17,16 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PhantomJSController {
+public class PhantomJSController implements DataSupplier {
 
     private PhantomJSDriver driver = new PhantomJSDriver();
+    private LocalDateTime START_OF_YEAR;
 
     private SubjectsList subjectList;
 
@@ -34,15 +36,13 @@ public class PhantomJSController {
         this.subjectList = subjectList;
     }
 
-    public void createNewConnection() {
+    @Override
+    public void setupNewConnection() {
         driver.get("https://iuczniowie.progman.pl/idziennik");
         driver.manage().window().setSize(new Dimension(1920, 1080));
     }
 
-    public BufferedImage getCaptcha() {
-
-//        new WebDriverWait(driver, 10).until(
-//                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+    public BufferedImage getCaptchaImage() {
 
         try {
             Thread.sleep(300);
@@ -100,31 +100,41 @@ public class PhantomJSController {
         new WebDriverWait(driver, 20).until(
                 webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
 
-        WebElement widokMiesieczny = driver.findElementByXPath("//*[@id=\"wiadomosci_main\"]/tbody/tr[1]/td/div[2]/div/div");
-        widokMiesieczny.click();
-
-        // TUTAJ TRZEBA COs WYMYSLIC ZEBY KLIKAL JAK BEDZIE KONIEC LADOWANIA
-
-        new WebDriverWait(driver, 20).until(
-                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-
-//        Thread.sleep(600);
-
-        WebElement prevButton = driver.findElementByXPath("//*[@id=\"tabelaMainContent\"]/tbody/tr[1]/td/div/div[2]/div[1]");
-        prevButton.click();
         try {
             Thread.sleep(600);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        prevButton.click();
+//        WebElement widokMiesieczny = driver.findElementByXPath("//*[@id=\"wiadomosci_main\"]/tbody/tr[1]/td/div[2]/div/div");
+//        widokMiesieczny.click();
+
+        // TUTAJ TRZEBA COs WYMYSLIC ZEBY KLIKAL JAK BEDZIE KONIEC LADOWANIA
+
+        new WebDriverWait(driver, 20).until(
+                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(600);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+//        WebElement prevButton = driver.findElementByXPath("//*[@id=\"tabelaMainContent\"]/tbody/tr[1]/td/div/div[2]/div[1]");
+//        prevButton.click();
+//        try {
+//            Thread.sleep(600);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        prevButton.click();
+//
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
 //        makeSS();
     }
