@@ -4,6 +4,10 @@ import com.example.model.Subject;
 import com.example.model.User;
 import com.example.service.SubjectsList;
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -24,6 +28,8 @@ import java.util.stream.Collectors;
 @Controller
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PhantomJSController implements DataSupplier {
+
+    private static final LocalDateTime TODAY = LocalDateTime.now();
 
     private PhantomJSDriver driver = new PhantomJSDriver();
     private LocalDateTime START_OF_YEAR;
@@ -106,8 +112,6 @@ public class PhantomJSController implements DataSupplier {
             e.printStackTrace();
         }
 
-//        WebElement widokMiesieczny = driver.findElementByXPath("//*[@id=\"wiadomosci_main\"]/tbody/tr[1]/td/div[2]/div/div");
-//        widokMiesieczny.click();
 
         // TUTAJ TRZEBA COs WYMYSLIC ZEBY KLIKAL JAK BEDZIE KONIEC LADOWANIA
 
@@ -120,86 +124,90 @@ public class PhantomJSController implements DataSupplier {
             e.printStackTrace();
         }
 
-//        WebElement prevButton = driver.findElementByXPath("//*[@id=\"tabelaMainContent\"]/tbody/tr[1]/td/div/div[2]/div[1]");
-//        prevButton.click();
-//        try {
-//            Thread.sleep(600);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//
-//        prevButton.click();
-//
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-//        makeSS();
     }
 
     public void createStatistic() {
-        List<WebElement> dirtyAllList = driver.findElementsByClassName("przedmiot");
-        List<WebElement> clearWebElementsList = new ArrayList<>();
+        String pageSource = driver.getPageSource();
+        Document htmlDocument = Jsoup.parse(pageSource);
 
-        for (WebElement element : dirtyAllList) {
-            String text = element.getText();
-            if (!(text.length() == 0 || text.contains("Ferie"))) {
-                clearWebElementsList.add(element);
+        Elements allDays = htmlDocument.getElementsByClass("dzienMiesiaca");
+        Elements selectedDays = new Elements();
+
+
+        for (Element element : allDays) {
+            Element dzienMiesiacaHead = element.getElementsByClass("dzienMiesiacaHead").first();
+            char dayOfMonth = dzienMiesiacaHead.text().charAt(0);
+            int dayOfMonthInt = Integer.parseInt(String.valueOf(dayOfMonth));
+            if (dayOfMonthInt < TODAY.getDayOfMonth()) {
+                selectedDays.add(element);
             }
         }
 
+        //remove bugged day (2 september)
+        selectedDays.remove(0);
+
         Set<Subject> subjectSet = new HashSet<>();
 
-        //subject initialization
-        for (WebElement element : clearWebElementsList) {
-//            char presenceCategory = element.getAttribute("class").charAt(element.getAttribute("class").length()-1);
-            String subjectName = element.getText().substring(4);
-            Subject subject = new Subject();
-            subject.setName(subjectName);
-            subjectSet.add(subject);
+        for (Element element : selectedDays) {
+            Elements children = element.children();
+            Iterator<Element> iterator = children.iterator();
+            iterator.next(); //shift date header (example: 3 September)
+            while (iterator.hasNext()) {
+                String subjectName = iterator.next().text().substring(4);
+                Subject subject = new Subject();
+                subject.setName(subjectName);
+                subjectSet.add(subject);
+            }
         }
 
         List<Subject> localSubjectList = new ArrayList<>(subjectSet);
         Map<String, Subject> map = subjectSet.stream().collect(Collectors.toMap(Subject::getName, e -> e));
 
-        for (WebElement element : clearWebElementsList) {
-            char presenceCategory = element.getAttribute("class").charAt(element.getAttribute("class").length() - 1);
+        for (Element subjectElement : selectedDays) {
+            Elements children = subjectElement.children();
+            Iterator<Element> iterator = children.iterator();
+            iterator.next();
+            while (iterator.hasNext()){
+                Element element = iterator.next();
+                String classString = element.attr("class");
+                char presenceCategory = classString.charAt(classString.length() - 1);
 
-            String subjectNameFromElement = element.getText().substring(4);
+                String subjectName = element.text().substring(4);
 
-            Subject subject = map.get(subjectNameFromElement);
+                Subject subject = map.get(subjectName);
 
-            switch (presenceCategory) {
-                case '0':
-                    subject.setObecny(subject.getObecny() + 1);
-                    break;
-                case '1':
-                    subject.setNieobecnyUsprawiedliwiony(subject.getNieobecnyUsprawiedliwiony() + 1);
-                    break;
-                case '2':
-                    subject.setSpozniony(subject.getSpozniony() + 1);
-                    break;
-                case '3':
-                    subject.setNieobecny(subject.getNieobecny() + 1);
-                    break;
-                case '4':
-                    subject.setZwolnienie(subject.getZwolnienie() + 1);
-                    break;
-                case '5':
-                    subject.setNieOdbylySie(subject.getNieOdbylySie() + 1);
-                    break;
-                case '9':
-                    subject.setZwolnionyObecny(subject.getZwolnionyObecny() + 1);
-                    break;
-                default:
-                    System.err.println("Cos sie zjebalo");
 
+                switch (presenceCategory) {
+                    case '0':
+                        subject.setObecny(subject.getObecny() + 1);
+                        break;
+                    case '1':
+                        subject.setNieobecnyUsprawiedliwiony(subject.getNieobecnyUsprawiedliwiony() + 1);
+                        break;
+                    case '2':
+                        subject.setSpozniony(subject.getSpozniony() + 1);
+                        break;
+                    case '3':
+                        subject.setNieobecny(subject.getNieobecny() + 1);
+                        break;
+                    case '4':
+                        subject.setZwolnienie(subject.getZwolnienie() + 1);
+                        break;
+                    case '5':
+                        subject.setNieOdbylySie(subject.getNieOdbylySie() + 1);
+                        break;
+                    case '9':
+                        subject.setZwolnionyObecny(subject.getZwolnionyObecny() + 1);
+                        break;
+                    default:
+                        System.err.println("Cos sie zjebalo");
+
+                }
             }
         }
 
-//        subjectList.getSubjectList().addAll(localSubjectList);
+        subjectSet.forEach(System.out::println);
+
         subjectList.transmitList(localSubjectList);
     }
 
