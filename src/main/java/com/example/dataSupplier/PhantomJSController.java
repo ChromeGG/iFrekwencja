@@ -153,10 +153,14 @@ public class PhantomJSController implements DataSupplier {
             Iterator<Element> iterator = children.iterator();
             iterator.next(); //shift date header (example: 3 September)
             while (iterator.hasNext()) {
-                String subjectName = iterator.next().text().substring(4);
-                Subject subject = new Subject();
-                subject.setName(subjectName);
-                subjectSet.add(subject);
+                try{
+                    String subjectName = iterator.next().text().substring(4);
+                    Subject subject = new Subject();
+                    subject.setName(subjectName);
+                    subjectSet.add(subject);
+                }catch (StringIndexOutOfBoundsException ex){
+                    ex.getStackTrace();
+                }
             }
         }
 
@@ -172,7 +176,14 @@ public class PhantomJSController implements DataSupplier {
                 String classString = element.attr("class");
                 char presenceCategory = classString.charAt(classString.length() - 1);
 
-                String subjectName = element.text().substring(4);
+
+                String subjectName = "Error";
+                try {
+                    subjectName = element.text().substring(4);
+                } catch (StringIndexOutOfBoundsException ex){
+                    ex.printStackTrace();
+                }
+
 
                 Subject subject = map.get(subjectName);
 
