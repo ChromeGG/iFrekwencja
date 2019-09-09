@@ -4,6 +4,8 @@ import com.example.model.Subject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SubjectsList {
 
     List<Subject> subjectList = new ArrayList<>();
@@ -35,7 +38,7 @@ public class SubjectsList {
             } else if (positiveHours == 0) {
                 frequency = 0;
             } else {
-                frequency = positiveHours * 100  / allMatterHours;
+                frequency = positiveHours * 100 / allMatterHours;
             }
             formetedFrequency = Double.parseDouble(String.format("%.2f", frequency));
 

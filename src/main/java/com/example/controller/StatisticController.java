@@ -22,7 +22,7 @@ public class StatisticController {
     }
 
     @GetMapping
-    public String statistic(Model model){
+    public String statistic(Model model) {
         List<Subject> subjects = subjectsList.getSubjectList();
         model.addAttribute("subjectList", subjects);
         return "statistic";

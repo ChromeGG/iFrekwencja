@@ -1,9 +1,14 @@
 package com.example.dataSupplier;
 
-import java.awt.image.BufferedImage;
+import com.example.model.User;
 
 public interface DataSupplier {
 
     void setupNewConnection();
-    BufferedImage getCaptchaImage();
+
+    String getCaptchaString();
+
+    void logIn(User user);
+
+    void createStats();
 }
