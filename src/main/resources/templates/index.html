@@ -13,6 +13,8 @@
     <p>Hasło:<input type="password" th:field="*{password}"></p>
     <p>Przepisz kod:<input type="text" th:field="*{captcha}"> <img
             th:src="@{'data:image/jpeg;base64,'+${captchaImage}}"/></p>
+    <p>Zliczanie od: <input id="datefield" type="date" min="2019-09-02" max="2020-06-21" value="2019-09-02"></p>
+    <p>Zliczanie do: <input id="datefield2" type="date" min="2019-09-02" max="2020-06-21" value="2020-06-21"></p>
     <p><input type="submit" value="Zaloguj"></p>
 </form>
 

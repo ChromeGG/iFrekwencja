@@ -94,7 +94,11 @@ public class PhantomJSController implements DataSupplier {
 
     @Override
     public void createStats() {
+        setupRangeToCount();
+    }
 
+    private void setupRangeToCount() {
+        private
     }
 
     private void wait(int millis) {

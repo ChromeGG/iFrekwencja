@@ -60,7 +60,6 @@ public class HomeController {
     @PostMapping
     public String createStatistic(@ModelAttribute User user) {
         //FIXME catch error when user is not correct:
-        //-asd
         dataSupplier.logIn(user);
 
         dataSupplier.createStats();

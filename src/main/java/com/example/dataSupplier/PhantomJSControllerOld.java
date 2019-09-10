@@ -67,8 +67,7 @@ public class PhantomJSControllerOld {
         Point capLocation = cap.getLocation();
 
 
-        BufferedImage imgCap = imageScreen.getSubimage(capLocation.x, capLocation.y, capDimension.width, capDimension.height);
-        return imgCap;
+        return imageScreen.getSubimage(capLocation.x, capLocation.y, capDimension.width, capDimension.height);
     }
 
     public void logIn(User user) {

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class User {
     String name;
     String password;
     String captcha;
-//    LocalDate sinceWhen;
-//    LocalDate untilWhen;
+    LocalDate sinceWhen;
+    LocalDate untilWhen;
 
 }
