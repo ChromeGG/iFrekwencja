@@ -3,14 +3,15 @@ package com.example.dataSupplier;
 import com.example.model.Subject;
 import com.example.model.User;
 import com.example.service.SubjectsList;
-import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -71,55 +71,55 @@ public class PhantomJSControllerOld {
     }
 
     public void logIn(User user) {
-        WebElement nazwaSzkoly = driver.findElementById("NazwaSzkoly");
-        WebElement userName = driver.findElementById("UserName");
-        WebElement password = driver.findElementById("Password");
-        WebElement captcha = driver.findElementById("captcha");
-        WebElement btnLogin = driver.findElementByClassName("btnLogin");
-
-        nazwaSzkoly.sendKeys(user.getSchoolName());
-        userName.sendKeys(user.getName());
-        password.sendKeys(user.getPassword());
-        captcha.sendKeys(user.getCaptcha());
-
-        btnLogin.click();
+//        WebElement nazwaSzkoly = driver.findElementById("NazwaSzkoly");
+//        WebElement userName = driver.findElementById("UserName");
+//        WebElement password = driver.findElementById("Password");
+//        WebElement captcha = driver.findElementById("captcha");
+//        WebElement btnLogin = driver.findElementByClassName("btnLogin");
+//
+//        nazwaSzkoly.sendKeys(user.getSchoolName());
+//        userName.sendKeys(user.getName());
+//        password.sendKeys(user.getPassword());
+//        captcha.sendKeys(user.getCaptcha());
+//
+//        btnLogin.click();
     }
 
     private void makeSS() {
-        TakesScreenshot ts = driver;
-        File source = ts.getScreenshotAs(OutputType.FILE);
-        try {
-            FileUtils.copyFile(source, new File("screen.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Screenshot created");
+//        TakesScreenshot ts = driver;
+//        File source = ts.getScreenshotAs(OutputType.FILE);
+//        try {
+//            FileUtils.copyFile(source, new File("screen.png"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("Screenshot created");
     }
 
     public void goToData() {
-        WebElement btn_obecnosci = driver.findElementByXPath("//*[@id=\"btn_obecnosci\"]/createStatistic");
-        btn_obecnosci.click();
-
-        new WebDriverWait(driver, 20).until(
-                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-
-        try {
-            Thread.sleep(600);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-        // TUTAJ TRZEBA COs WYMYSLIC ZEBY KLIKAL JAK BEDZIE KONIEC LADOWANIA
-
-        new WebDriverWait(driver, 20).until(
-                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-
-        try {
-            Thread.sleep(600);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        WebElement btn_obecnosci = driver.findElementByXPath("//*[@id=\"btn_obecnosci\"]/createStatistic");
+//        btn_obecnosci.click();
+//
+//        new WebDriverWait(driver, 20).until(
+//                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+//
+//        try {
+//            Thread.sleep(600);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        // TUTAJ TRZEBA COs WYMYSLIC ZEBY KLIKAL JAK BEDZIE KONIEC LADOWANIA
+//
+//        new WebDriverWait(driver, 20).until(
+//                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+//
+//        try {
+//            Thread.sleep(600);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
