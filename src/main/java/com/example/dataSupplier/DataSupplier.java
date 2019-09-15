@@ -8,7 +8,9 @@ public interface DataSupplier {
 
     String getCaptchaString();
 
-    void logIn(User user);
+    void logIn();
 
     void createStats();
+
+    void setUser(User user);
 }
