@@ -4,9 +4,12 @@ import com.example.model.Subject;
 import com.example.model.User;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -103,31 +106,126 @@ public class PhantomJSController implements DataSupplier {
     public void createStats() {
         goToUserFrequency();
         goToStartMonth();
+        aggregateData();
 
+    }
+
+    private void aggregateData() {
+        Elements selectedDays = getDaysFromUserRange();
+    }
+
+    private Elements getDaysFromUserRange() {
+        String pageSource = driver.getPageSource();
+        Document htmlDocument = Jsoup.parse(pageSource);
+
+        Elements allDays = htmlDocument.getElementsByClass("dzienMiesiaca");
+        int startDay = user.getSinceWhen().getDayOfMonth();
+        int endDay = user.getUntilWhen().getDayOfMonth();
+
+        int differenceBetweenMonths = user.getUntilWhen().getMonthValue() - user.getSinceWhen().getMonthValue();
+
+        Elements selectedDays = new Elements();
+
+        if (differenceBetweenMonths == 0) {
+            selectedDays = parseOnlyOneMonth(startDay, endDay, allDays);
+        } else if (differenceBetweenMonths == 1) {
+            selectedDays.addAll(parseStartMonth(startDay, allDays));
+
+            clickNextMonthButton(driver.findElementByClassName("nextButton"), 500);
+
+            selectedDays.addAll(parseEndMonth(endDay, allDays));
+        } else {
+            selectedDays.addAll(parseStartMonth(startDay, allDays));
+
+            do {
+                clickNextMonthButton(driver.findElementByClassName("nextButton"), 500);
+                selectedDays.addAll(parseFullMonth(allDays));
+                differenceBetweenMonths--;
+            } while (differenceBetweenMonths <= 1);
+
+
+            selectedDays.addAll(parseEndMonth(endDay, allDays));
+
+        }
+
+        return selectedDays;
+
+    }
+
+    private Elements parseFullMonth(Elements allDays) {
+        Elements aggregatedDays = new Elements();
+
+        for (Element day : allDays) {
+            int dayNumber = getDayNumber(day);
+
+            //FIXME (Na przyszlosc)
+            // Dni maja czasami nagłowki dni, ale sa puste np.30 Wrzesien
+            // Więc może sie bugować i dodawać pusty dzień
+            if (dayNumber != 0) {
+                aggregatedDays.add(day);
+            }
+        }
+
+        return aggregatedDays;
+    }
+
+
+    private Elements parseEndMonth(int endDay, Elements allDays) {
+        Elements aggregatedDays = new Elements();
+        for (Element day : allDays) {
+            int dayNumber = getDayNumber(day);
+
+            if (dayNumber <= endDay) {
+                aggregatedDays.add(day);
+            }
+        }
+
+        return aggregatedDays;
+    }
+
+    private Elements parseStartMonth(int startDay, Elements allDays) {
+        Elements aggregatedDays = new Elements();
+        for (Element day : allDays) {
+            int dayNumber = getDayNumber(day);
+
+            if (dayNumber >= startDay) {
+                aggregatedDays.add(day);
+            }
+        }
+
+        return aggregatedDays;
+    }
+
+
+    private Elements parseOnlyOneMonth(int startDay, int endDay, Elements allDays) {
+        Elements aggregatedDays = new Elements();
+        for (Element day : allDays) {
+            int dayNumber = getDayNumber(day);
+
+            if (dayNumber >= startDay && (dayNumber < endDay || dayNumber == endDay)) {
+                aggregatedDays.add(day);
+            }
+        }
+
+        return aggregatedDays;
     }
 
     private void goToUserFrequency() {
         WebElement obecnosciButton = driver.findElementByLinkText("Obecności");
         obecnosciButton.click();
 
-        new WebDriverWait(driver, 20).until(
-                webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-
-        try {
-            Thread.sleep(400);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        wait(600);
 
         List<WebElement> viewsButtons = driver.findElementsByClassName("label");
         WebElement monthlyViewButton = viewsButtons.get(1);
         monthlyViewButton.click();
-
+        wait(600);
     }
 
     private Set<Subject> initSubjects() {
         Set<Subject> subjects = new HashSet<>();
+        String pageSource = driver.getPageSource();
+
 
         return null;
     }
@@ -138,7 +236,7 @@ public class PhantomJSController implements DataSupplier {
         while (prevoiusMonthClicks > 0) {
             driver.findElementByClassName("prevButton").click();
             prevoiusMonthClicks--;
-            wait(400);
+            wait(600);
         }
     }
 
@@ -155,6 +253,23 @@ public class PhantomJSController implements DataSupplier {
         System.out.println("Screenshot created");
     }
 
+    private int getDayNumber(Element day) {
+        String id;
+        id = day.id(); //example: dzien_3, but sometimes id = ""
+
+        int dayNumber = 0;
+        if (id.length() > 1) {
+            dayNumber = Integer.parseInt(id.replaceAll("[^0-9]", "")); //returns only numbers from id
+
+        }
+        return dayNumber;
+    }
+
+    private void clickNextMonthButton(WebElement nextButton, int i) {
+        nextButton.click();
+        wait(i);
+    }
+
     private void wait(int millis) {
         try {
             Thread.sleep(millis);
@@ -162,6 +277,7 @@ public class PhantomJSController implements DataSupplier {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void setUser(User user) {
