@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.Subject;
-import com.example.service.SubjectsList;
+import com.example.service.CompleteSubjects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,18 +14,18 @@ import java.util.List;
 @RequestMapping("/statystyki")
 public class StatisticController {
 
-    private SubjectsList subjectsList;
+    private CompleteSubjects completeSubjects;
 
     @Autowired
-    public StatisticController(SubjectsList subjectsList) {
-        this.subjectsList = subjectsList;
+    public StatisticController(CompleteSubjects completeSubjects) {
+        this.completeSubjects = completeSubjects;
     }
 
     @GetMapping
     public String statistic(Model model) {
-        List<Subject> subjects = subjectsList.getSubjectList();
+        List<Subject> subjects = completeSubjects.getSubjectList();
         model.addAttribute("subjectList", subjects);
-        return "statistic";
+        return "html/statistic";
     }
 
 }

@@ -1,7 +1,6 @@
 package com.example.controller;
 
 import com.example.dataSupplier.DataSupplier;
-import com.example.dataSupplier.PhantomJSControllerOld;
 import com.example.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/ifrekwencja")
 public class HomeController {
 
-    @Autowired
-    private PhantomJSControllerOld phantomController;
-
     private DataSupplier dataSupplier;
 
     @Autowired
@@ -27,22 +23,8 @@ public class HomeController {
 
     @GetMapping
     public String home(Model model) {
-//        phantomController.setupNewConnection();
         dataSupplier.setupNewConnection();
         String captchaInBase64 = dataSupplier.getCaptchaString();
-
-        //To Remove if captchaInBase64 is correct
-
-//        BufferedImage captcha = phantomController.getCaptchaImage();
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        OutputStream b64 = new Base64OutputStream(baos);
-//        try {
-//            ImageIO.write(captcha, "png", b64);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        String captchaImageInBase64;
-//        captchaImageInBase64 = baos.toString(StandardCharsets.UTF_8);
 
         model.addAttribute("captchaImage", captchaInBase64);
         model.addAttribute("user", new User());
@@ -55,11 +37,12 @@ public class HomeController {
         dataSupplier.setUser(user);
         dataSupplier.logIn();
         dataSupplier.createStats();
-
-        phantomController.logIn(user);
-        phantomController.goToData();
-        phantomController.createStatistic();
-        phantomController.close();
+        dataSupplier.close();
+//
+//        phantomController.logIn(user);
+//        phantomController.goToData();
+//        phantomController.createStatistic();
+//        phantomController.close();
         return "redirect:statystyki";
     }
 }

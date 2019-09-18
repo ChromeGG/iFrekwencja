@@ -2,6 +2,7 @@ package com.example.dataSupplier;
 
 import com.example.model.Subject;
 import com.example.model.User;
+import com.example.service.CompleteSubjects;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -10,6 +11,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -19,10 +21,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Controller
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -33,8 +34,13 @@ public class PhantomJSController implements DataSupplier {
     private PhantomJSDriver driver;
     private User user;
 
-    public PhantomJSController() {
+    private final CompleteSubjects subjectList;
+
+
+    @Autowired
+    public PhantomJSController(CompleteSubjects subjectList) {
         this.driver = new PhantomJSDriver();
+        this.subjectList = subjectList;
     }
 
     @Override
@@ -106,12 +112,97 @@ public class PhantomJSController implements DataSupplier {
     public void createStats() {
         goToUserFrequency();
         goToStartMonth();
-        aggregateData();
-
+        List<Subject> completeSubjectList = aggregateData();
+        sendSubjectSet(completeSubjectList);
     }
 
-    private void aggregateData() {
+    private void sendSubjectSet(List<Subject> completeSubjectList) {
+
+        subjectList.transferList(completeSubjectList);
+    }
+
+    private List<Subject> aggregateData() {
         Elements selectedDays = getDaysFromUserRange();
+        Set<Subject> subjects = getSubjects(selectedDays);
+        return fillSubjectsData(subjects, selectedDays);
+    }
+
+    private List<Subject> fillSubjectsData(Set<Subject> subjects, Elements selectedDays) {
+        List<Subject> completeSubjectsList = new ArrayList<>(subjects);
+        Map<String, Subject> map = subjects.stream().collect(Collectors.toMap(Subject::getName, e -> e));
+
+        for (Element subjectElement : selectedDays) {
+            Elements children = subjectElement.children();
+            Iterator<Element> iterator = children.iterator();
+            iterator.next(); //przewijamy naglowek dnia
+            while (iterator.hasNext()) {
+                Element element = iterator.next();
+                String classString = element.attr("class");
+                if (classString.equals("okienko")) {
+                    break;
+                }
+                char presenceCategory = classString.charAt(classString.length() - 1);
+
+                String subjectName = "Erroroo";
+                try {
+                    subjectName = element.text().substring(4);
+                } catch (StringIndexOutOfBoundsException ex) {
+                    ex.printStackTrace();
+                }
+
+                Subject subject = map.get(subjectName);
+
+                switch (presenceCategory) {
+                    case '0':
+                        subject.setObecny(subject.getObecny() + 1);
+                        break;
+                    case '1':
+                        subject.setNieobecnyUsprawiedliwiony(subject.getNieobecnyUsprawiedliwiony() + 1);
+                        break;
+                    case '2':
+                        subject.setSpozniony(subject.getSpozniony() + 1);
+                        break;
+                    case '3':
+                        subject.setNieobecny(subject.getNieobecny() + 1);
+                        break;
+                    case '4':
+                        subject.setZwolnienie(subject.getZwolnienie() + 1);
+                        break;
+                    case '5':
+                        subject.setNieOdbylySie(subject.getNieOdbylySie() + 1);
+                        break;
+                    case '9':
+                        subject.setZwolnionyObecny(subject.getZwolnionyObecny() + 1);
+                        break;
+                    default:
+                        System.err.println("Cos sie zjebalo");
+
+                }
+            }
+        }
+        return completeSubjectsList;
+    }
+
+    private Set<Subject> getSubjects(Elements days) {
+        Set<Subject> subjectSet = new HashSet<>();
+
+        for (Element element : days) {
+            Elements children = element.children();
+            Iterator<Element> iterator = children.iterator();
+            iterator.next(); //shift date header (example: 3 September)
+            while (iterator.hasNext()) {
+                try {
+                    String subjectName = iterator.next().text().substring(4);
+                    Subject subject = new Subject();
+                    subject.setName(subjectName);
+                    subjectSet.add(subject);
+                } catch (StringIndexOutOfBoundsException ex) {
+                    ex.getStackTrace();
+                }
+            }
+        }
+
+        return subjectSet;
     }
 
     private Elements getDaysFromUserRange() {
@@ -222,14 +313,6 @@ public class PhantomJSController implements DataSupplier {
         wait(600);
     }
 
-    private Set<Subject> initSubjects() {
-        Set<Subject> subjects = new HashSet<>();
-        String pageSource = driver.getPageSource();
-
-
-        return null;
-    }
-
     private void goToStartMonth() {
         int prevoiusMonthClicks = TODAY.getMonthValue() - user.getSinceWhen().getMonthValue();
 
@@ -282,5 +365,10 @@ public class PhantomJSController implements DataSupplier {
     @Override
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public void close() {
+        driver.close();
     }
 }

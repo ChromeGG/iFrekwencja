@@ -13,4 +13,6 @@ public interface DataSupplier {
     void createStats();
 
     void setUser(User user);
+
+    void close();
 }
