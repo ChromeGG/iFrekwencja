@@ -1,28 +1,28 @@
 package com.example.service;
 
 import com.example.model.Subject;
+import com.example.model.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @Data
 @NoArgsConstructor
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CompleteSubjects {
+@AllArgsConstructor
+//@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class FrontData {
 
-    List<Subject> subjectList;
+    User user;
+    List<Subject> subjectList = new ArrayList<>();
 
-    public List<Subject> getSubjectList() {
-        return subjectList;
-    }
-
-    public void transferList(List<Subject> localSubjectList) {
-        this.subjectList = localSubjectList;
+    public void receiveData(List<Subject> subjectList, User user) {
+        this.subjectList = subjectList;
+        this.user = user;
         addFrequency();
     }
 

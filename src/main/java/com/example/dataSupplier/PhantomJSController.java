@@ -2,7 +2,7 @@ package com.example.dataSupplier;
 
 import com.example.model.Subject;
 import com.example.model.User;
-import com.example.service.CompleteSubjects;
+import com.example.service.FrontData;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -34,13 +34,13 @@ public class PhantomJSController implements DataSupplier {
     private PhantomJSDriver driver;
     private User user;
 
-    private final CompleteSubjects subjectList;
+    private final FrontData frontData;
 
 
     @Autowired
-    public PhantomJSController(CompleteSubjects subjectList) {
+    public PhantomJSController(FrontData frontData) {
         this.driver = new PhantomJSDriver();
-        this.subjectList = subjectList;
+        this.frontData = frontData;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class PhantomJSController implements DataSupplier {
 
     private void sendSubjectSet(List<Subject> completeSubjectList) {
 
-        subjectList.transferList(completeSubjectList);
+        frontData.receiveData(completeSubjectList, user);
     }
 
     private List<Subject> aggregateData() {
@@ -134,7 +134,7 @@ public class PhantomJSController implements DataSupplier {
         for (Element subjectElement : selectedDays) {
             Elements children = subjectElement.children();
             Iterator<Element> iterator = children.iterator();
-            iterator.next(); //przewijamy naglowek dnia
+            iterator.next(); //shift date header (example: 3 September)
             while (iterator.hasNext()) {
                 Element element = iterator.next();
                 String classString = element.attr("class");
@@ -222,14 +222,14 @@ public class PhantomJSController implements DataSupplier {
         } else if (differenceBetweenMonths == 1) {
             selectedDays.addAll(parseStartMonth(startDay, allDays));
 
-            clickNextMonthButton(driver.findElementByClassName("nextButton"), 500);
+            clickNextMonthButton(driver.findElementByClassName("nextButton"));
 
             selectedDays.addAll(parseEndMonth(endDay, allDays));
         } else {
             selectedDays.addAll(parseStartMonth(startDay, allDays));
 
             do {
-                clickNextMonthButton(driver.findElementByClassName("nextButton"), 500);
+                clickNextMonthButton(driver.findElementByClassName("nextButton"));
                 selectedDays.addAll(parseFullMonth(allDays));
                 differenceBetweenMonths--;
             } while (differenceBetweenMonths <= 1);
@@ -310,6 +310,7 @@ public class PhantomJSController implements DataSupplier {
         List<WebElement> viewsButtons = driver.findElementsByClassName("label");
         WebElement monthlyViewButton = viewsButtons.get(1);
         monthlyViewButton.click();
+
         wait(600);
     }
 
@@ -348,9 +349,9 @@ public class PhantomJSController implements DataSupplier {
         return dayNumber;
     }
 
-    private void clickNextMonthButton(WebElement nextButton, int i) {
+    private void clickNextMonthButton(WebElement nextButton) {
         nextButton.click();
-        wait(i);
+        wait(500);
     }
 
     private void wait(int millis) {
