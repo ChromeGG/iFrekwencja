@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Subject {
 
+    public Subject(String name) {
+        this.name = name;
+    }
+
     private String name;
 
     private double frequency;

@@ -1,5 +1,7 @@
 package com.example.dataSupplier;
 
+import com.example.model.Day;
+import com.example.model.Lesion;
 import com.example.model.Subject;
 import com.example.model.User;
 import com.example.service.FrontData;
@@ -77,7 +79,6 @@ public class PhantomJSController implements DataSupplier {
         }
 
         String captchaImageInBase64 = baos.toString(StandardCharsets.UTF_8);
-//        captchaImageInBase64;
 
         return captchaImageInBase64;
     }
@@ -117,61 +118,48 @@ public class PhantomJSController implements DataSupplier {
     }
 
     private void sendSubjectSet(List<Subject> completeSubjectList) {
-
         frontData.receiveData(completeSubjectList, user);
     }
 
     private List<Subject> aggregateData() {
-        Elements selectedDays = getDaysFromUserRange();
-        Set<Subject> subjects = getSubjects(selectedDays);
-        return fillSubjectsData(subjects, selectedDays);
+        List<Day> selectedDays = getDaysFromUserRange();
+        Set<Subject> subjects = initSubjects(selectedDays);
+        List<Subject> completeSubjectList = assignFrequencyToSubjects(subjects, selectedDays);
+        return completeSubjectList;
     }
 
-    private List<Subject> fillSubjectsData(Set<Subject> subjects, Elements selectedDays) {
+    private List<Subject> assignFrequencyToSubjects(Set<Subject> subjects, List<Day> selectedDays) {
         List<Subject> completeSubjectsList = new ArrayList<>(subjects);
         Map<String, Subject> map = subjects.stream().collect(Collectors.toMap(Subject::getName, e -> e));
 
-        for (Element subjectElement : selectedDays) {
-            Elements children = subjectElement.children();
-            Iterator<Element> iterator = children.iterator();
-            iterator.next(); //shift date header (example: 3 September)
-            while (iterator.hasNext()) {
-                Element element = iterator.next();
-                String classString = element.attr("class");
-                if (classString.equals("okienko")) {
-                    break;
-                }
-                char presenceCategory = classString.charAt(classString.length() - 1);
+        for (Day day : selectedDays) {
+            List<Lesion> lesions = day.getLesions();
+            for (Lesion lesion : lesions) {
+                String nameLesion = lesion.getName();
+                int category = lesion.getCategory();
 
-                String subjectName = "Erroroo";
-                try {
-                    subjectName = element.text().substring(4);
-                } catch (StringIndexOutOfBoundsException ex) {
-                    ex.printStackTrace();
-                }
+                Subject subject = map.get(nameLesion);
 
-                Subject subject = map.get(subjectName);
-
-                switch (presenceCategory) {
-                    case '0':
+                switch (category) {
+                    case 0:
                         subject.setObecny(subject.getObecny() + 1);
                         break;
-                    case '1':
+                    case 1:
                         subject.setNieobecnyUsprawiedliwiony(subject.getNieobecnyUsprawiedliwiony() + 1);
                         break;
-                    case '2':
+                    case 2:
                         subject.setSpozniony(subject.getSpozniony() + 1);
                         break;
-                    case '3':
+                    case 3:
                         subject.setNieobecny(subject.getNieobecny() + 1);
                         break;
-                    case '4':
+                    case 4:
                         subject.setZwolnienie(subject.getZwolnienie() + 1);
                         break;
-                    case '5':
+                    case 5:
                         subject.setNieOdbylySie(subject.getNieOdbylySie() + 1);
                         break;
-                    case '9':
+                    case 9:
                         subject.setZwolnionyObecny(subject.getZwolnionyObecny() + 1);
                         break;
                     default:
@@ -180,62 +168,56 @@ public class PhantomJSController implements DataSupplier {
                 }
             }
         }
+
+
         return completeSubjectsList;
     }
 
-    private Set<Subject> getSubjects(Elements days) {
+
+    private Set<Subject> initSubjects(List<Day> days) {
         Set<Subject> subjectSet = new HashSet<>();
 
-        for (Element element : days) {
-            Elements children = element.children();
-            Iterator<Element> iterator = children.iterator();
-            iterator.next(); //shift date header (example: 3 September)
-            while (iterator.hasNext()) {
-                try {
-                    String subjectName = iterator.next().text().substring(4);
-                    Subject subject = new Subject();
-                    subject.setName(subjectName);
-                    subjectSet.add(subject);
-                } catch (StringIndexOutOfBoundsException ex) {
-                    ex.getStackTrace();
-                }
+        for (Day day : days) {
+            List<Lesion> lesions = day.getLesions();
+            for (Lesion lesion : lesions) {
+                String lesionName = lesion.getName();
+                Subject subject = new Subject(lesionName);
+                subjectSet.add(subject);
             }
         }
-
         return subjectSet;
     }
 
-    private Elements getDaysFromUserRange() {
+    private List<Day> getDaysFromUserRange() {
         String pageSource = driver.getPageSource();
         Document htmlDocument = Jsoup.parse(pageSource);
 
-        Elements allDays = htmlDocument.getElementsByClass("dzienMiesiaca");
+        Elements htmlAllDays = htmlDocument.getElementsByClass("dzienMiesiaca");
         int startDay = user.getSinceWhen().getDayOfMonth();
         int endDay = user.getUntilWhen().getDayOfMonth();
 
         int differenceBetweenMonths = user.getUntilWhen().getMonthValue() - user.getSinceWhen().getMonthValue();
 
-        Elements selectedDays = new Elements();
+        List<Day> selectedDays = new ArrayList<>();
 
-        if (differenceBetweenMonths == 0) {
-            selectedDays = parseOnlyOneMonth(startDay, endDay, allDays);
+        if (differenceBetweenMonths <= 0) {
+            selectedDays.addAll(parseOnlyOneMonth(startDay, endDay, htmlAllDays));
         } else if (differenceBetweenMonths == 1) {
-            selectedDays.addAll(parseStartMonth(startDay, allDays));
+            selectedDays.addAll(parseStartMonth(startDay, htmlAllDays));
 
             clickNextMonthButton(driver.findElementByClassName("nextButton"));
 
-            selectedDays.addAll(parseEndMonth(endDay, allDays));
+            selectedDays.addAll(parseEndMonth(endDay, htmlAllDays));
         } else {
-            selectedDays.addAll(parseStartMonth(startDay, allDays));
+            selectedDays.addAll(parseStartMonth(startDay, htmlAllDays));
 
             do {
                 clickNextMonthButton(driver.findElementByClassName("nextButton"));
-                selectedDays.addAll(parseFullMonth(allDays));
+                selectedDays.addAll(parseFullMonth(htmlAllDays));
                 differenceBetweenMonths--;
             } while (differenceBetweenMonths <= 1);
 
-
-            selectedDays.addAll(parseEndMonth(endDay, allDays));
+            selectedDays.addAll(parseEndMonth(endDay, htmlAllDays));
 
         }
 
@@ -243,62 +225,104 @@ public class PhantomJSController implements DataSupplier {
 
     }
 
-    private Elements parseFullMonth(Elements allDays) {
-        Elements aggregatedDays = new Elements();
+    private List<Day> parseFullMonth(Elements allDays) {
+        List<Day> days = new ArrayList<>();
 
-        for (Element day : allDays) {
-            int dayNumber = getDayNumber(day);
+        for (Element htmlDay : allDays) {
+            int dayNumber = getDayNumber(htmlDay);
+
+            Day day = new Day();
+            day.setDayOfMonth(dayNumber);
+
 
             //FIXME (Na przyszlosc)
             // Dni maja czasami nagłowki dni, ale sa puste np.30 Wrzesien
             // Więc może sie bugować i dodawać pusty dzień
             if (dayNumber != 0) {
-                aggregatedDays.add(day);
+                List<Lesion> lesionsOfDay = getLesionsFromDay(htmlDay);
+                day.setLesions(lesionsOfDay);
             }
         }
 
-        return aggregatedDays;
+        return days;
     }
 
 
-    private Elements parseEndMonth(int endDay, Elements allDays) {
-        Elements aggregatedDays = new Elements();
-        for (Element day : allDays) {
-            int dayNumber = getDayNumber(day);
+    @SuppressWarnings("Duplicates")
+    private List<Day> parseEndMonth(int endDay, Elements allDays) {
+        List<Day> days = new ArrayList<>();
+
+        for (Element htmlDay : allDays) {
+            int dayNumber = getDayNumber(htmlDay);
+
+            Day day = new Day();
+            day.setDayOfMonth(dayNumber);
 
             if (dayNumber <= endDay) {
-                aggregatedDays.add(day);
+                List<Lesion> lesionsOfDay = getLesionsFromDay(htmlDay);
+                day.setLesions(lesionsOfDay);
+                days.add(day);
             }
         }
 
-        return aggregatedDays;
+        return days;
     }
 
-    private Elements parseStartMonth(int startDay, Elements allDays) {
-        Elements aggregatedDays = new Elements();
-        for (Element day : allDays) {
-            int dayNumber = getDayNumber(day);
+    @SuppressWarnings("Duplicates")
+    private List<Day> parseStartMonth(int startDay, Elements htmlDays) {
+        List<Day> days = new ArrayList<>();
+        for (Element htmlDay : htmlDays) {
+            int dayNumber = getDayNumber(htmlDay);
+
+            Day day = new Day();
+            day.setDayOfMonth(dayNumber);
 
             if (dayNumber >= startDay) {
-                aggregatedDays.add(day);
+                List<Lesion> lesionsOfDay = getLesionsFromDay(htmlDay);
+                day.setLesions(lesionsOfDay);
+                days.add(day);
             }
         }
 
-        return aggregatedDays;
+        return days;
     }
 
 
-    private Elements parseOnlyOneMonth(int startDay, int endDay, Elements allDays) {
-        Elements aggregatedDays = new Elements();
-        for (Element day : allDays) {
-            int dayNumber = getDayNumber(day);
+    private List<Day> parseOnlyOneMonth(int startDay, int endDay, Elements htmlAllDays) {
+        List<Day> days = new ArrayList<>();
+        for (Element htmlDay : htmlAllDays) {
+            int dayNumber = getDayNumber(htmlDay);
+
+            Day day = new Day();
+            day.setDayOfMonth(dayNumber);
 
             if (dayNumber >= startDay && (dayNumber < endDay || dayNumber == endDay)) {
-                aggregatedDays.add(day);
+                List<Lesion> lesionsOfDay = getLesionsFromDay(htmlDay);
+                day.setLesions(lesionsOfDay);
+                days.add(day);
             }
         }
 
-        return aggregatedDays;
+        return days;
+    }
+
+    private List<Lesion> getLesionsFromDay(Element htmlDay) {
+        List<Lesion> lesionsOfDay = new ArrayList<>();
+
+        for (Element lesionHtml : htmlDay.children()) {
+            String attributesString = lesionHtml.attr("class");
+            //TODO add "ferie" to ignored lesions
+            if (attributesString.contains("dzienMiesiaca") || attributesString.contains("okienko")) {
+                //ignore day
+            } else {
+                String lesionName = lesionHtml.text().substring(4);
+
+                int attendanceCategory = Integer.parseInt(attributesString.replaceAll("[^0-9]", ""));
+                Lesion lesion = new Lesion(lesionName, attendanceCategory);
+                lesionsOfDay.add(lesion);
+            }
+        }
+        return lesionsOfDay;
     }
 
     private void goToUserFrequency() {
