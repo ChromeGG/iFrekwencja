@@ -1,11 +1,12 @@
 package com.example.controller;
 
 import com.example.model.Subject;
-import com.example.service.SubjectsList;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.model.User;
+import com.example.service.FrontData;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -14,18 +15,30 @@ import java.util.List;
 @RequestMapping("/statystyki")
 public class StatisticController {
 
-    private SubjectsList subjectsList;
+    private FrontData frontData;
 
-    @Autowired
-    public StatisticController(SubjectsList subjectsList) {
-        this.subjectsList = subjectsList;
+    public StatisticController(FrontData frontData) {
+        this.frontData = frontData;
     }
 
     @GetMapping
-    public String statistic(Model model) {
-        List<Subject> subjects = subjectsList.getSubjectList();
-        model.addAttribute("subjectList", subjects);
-        return "statistic";
+    public String statistic(@ModelAttribute("mapping1Form") List<Subject> mapping1FormObject, Model model) {
+        List<Subject> subjects = frontData.getSubjectList();
+        User user = frontData.getUser();
+        model.addAttribute("subjectsList", mapping1FormObject);
+        model.addAttribute("user", user);
+        return "html/statistic";
     }
 
+//    @GetMapping
+//    public String statistic(
+//            @ModelAttribute("mapping1Form") List<Subject> mapping1FormObject,
+//            final BindingResult mapping1BindingResult,
+//            Model model) {
+//        List<Subject> subjects = frontData.getSubjectList();
+//        User user = frontData.getUser();
+//        model.addAttribute("subjectsList",mapping1FormObject);
+//        model.addAttribute("user", user);
+//        return "html/statistic";
+//    }
 }

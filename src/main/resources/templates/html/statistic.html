@@ -2,11 +2,15 @@
 <html lang="pl-Pl" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/style.css">
     <title>Statystki - iFrekwencja</title>
 </head>
 <body>
-<h1>Twoje statystyki:</h1>
-<table border="1">
+<!--<h1 th:object="${user}">Twoje statystyki od <span th:text="${user.sinceWhen}">RRRR-MM-DD</span> do <span-->
+<!--        th:text="${user.untilWhen}">RRRR-MM-DD</span>:</h1>-->
+<table class="table table-striped table-dark">
     <tr>
         <th>Nazwa przedmiotu</th>
         <th>obecny</th>
@@ -18,19 +22,18 @@
         <th>zajęcia nie odbyły sie</th>
         <th>% obecności</th>
     </tr>
-    <tr th:each="subject:${subjectList}">
-        <td th:text="${subject.name}"></td>
-        <td th:text="${subject.obecny}"></td>
-        <td th:text="${subject.zwolnionyObecny}"></td>
-        <td th:text="${subject.nieobecny}"></td>
-        <td th:text="${subject.nieobecnyUsprawiedliwiony}"></td>
-        <td th:text="${subject.zwolnienie}"></td>
-        <td th:text="${subject.spozniony}"></td>
-        <td th:text="${subject.nieOdbylySie}"></td>
-        <td th:text="${subject.frequency}"></td>
+    <tr th:each="subject:${subjectsList}">
+        <td th:text="${subject.name}">nazwa</td>
+        <td th:text="${subject.obecny}">1</td>
+        <td th:text="${subject.zwolnionyObecny}">2</td>
+        <td th:text="${subject.nieobecny}">3</td>
+        <td th:text="${subject.nieobecnyUsprawiedliwiony}">4</td>
+        <td th:text="${subject.zwolnienie}">5</td>
+        <td th:text="${subject.spozniony}">6</td>
+        <td th:text="${subject.nieOdbylySie}">7</td>
+        <td th:text="${subject.frequency}">8</td>
     </tr>
 
 </table>
-<a th:href="@{/}">Homepage</a>
 </body>
 </html>

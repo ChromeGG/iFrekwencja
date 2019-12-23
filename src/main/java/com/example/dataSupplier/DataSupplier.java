@@ -1,6 +1,9 @@
 package com.example.dataSupplier;
 
+import com.example.model.Subject;
 import com.example.model.User;
+
+import java.util.List;
 
 public interface DataSupplier {
 
@@ -10,7 +13,9 @@ public interface DataSupplier {
 
     void logIn();
 
-    void createStats();
+    List<Subject> createStats();
 
     void setUser(User user);
+
+    void close();
 }

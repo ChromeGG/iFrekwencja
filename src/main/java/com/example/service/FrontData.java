@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.model.Subject;
+import com.example.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,13 +16,15 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SubjectsList {
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE) //if it's commented, it's working, else not
+public class FrontData {
 
+    User user;
     List<Subject> subjectList = new ArrayList<>();
 
-    public void transmitList(List<Subject> localSubjectList) {
-        this.subjectList = localSubjectList;
+    public void receiveData(List<Subject> subjectList, User user) {
+        this.subjectList = subjectList;
+        this.user = user;
         addFrequency();
     }
 
@@ -31,7 +34,7 @@ public class SubjectsList {
             double negativeHours = subject.getNieobecny() + subject.getNieobecnyUsprawiedliwiony() + subject.getZwolnienie();
             double allMatterHours = positiveHours + negativeHours;
             double frequency;
-            double formetedFrequency;
+            double formattedFrequency;
 
             if (negativeHours == 0) {
                 frequency = 100;
@@ -40,10 +43,10 @@ public class SubjectsList {
             } else {
                 frequency = positiveHours * 100 / allMatterHours;
             }
-            formetedFrequency = Double.parseDouble(String.format("%.2f", frequency));
+            formattedFrequency = Double.parseDouble(String.format("%.2f", frequency));
 
-            System.out.println(subject.getName() + " : " + formetedFrequency);
-            subject.setFrequency(formetedFrequency);
+            System.out.println(subject.getName() + " : " + formattedFrequency);
+            subject.setFrequency(formattedFrequency);
         }
     }
 }

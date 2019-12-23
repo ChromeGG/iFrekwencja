@@ -1,25 +1,25 @@
-HELP.md
+help.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
 
-### STS ###
+### sts ###
 .apt_generated
 .classpath
 .factorypath
 .project
 .settings
-.springBeans
+.springbeans
 .sts4-cache
 
-### IntelliJ IDEA ###
+### intellij idea ###
 .idea
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+### netbeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -27,22 +27,22 @@ target/
 /.nb-gradle/
 build/
 
-### VS Code ###
+### vs code ###
 .vscode/
-### Java template
-# Compiled class file
+### java template
+# compiled class file
 *.class
 
-# Log file
+# log file
 *.log
 
-# BlueJ files
+# bluej files
 *.ctxt
 
-# Mobile Tools for Java (J2ME)
+# mobile tools for java (j2me)
 .mtj.tmp/
 
-# Package Files #
+# package files #
 *.jar
 *.war
 *.nar
@@ -53,26 +53,26 @@ build/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-### Maven template
+### maven template
 pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
+pom.xml.releasebackup
+pom.xml.versionsbackup
 pom.xml.next
 release.properties
 dependency-reduced-pom.xml
-buildNumber.properties
+buildnumber.properties
 .mvn/timing.properties
 
-# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+# avoid ignoring maven wrapper jar file (.jar files are usually ignored)
 !/.mvn/wrapper/maven-wrapper.jar
 
 
 
 
 /mvnw
-/Procfile
+/procfile
 /mvnw.cmd
 /target/
 /idziennik-frekwencja.iml
-/HELP.md
+/help.md
 /.mvn/
