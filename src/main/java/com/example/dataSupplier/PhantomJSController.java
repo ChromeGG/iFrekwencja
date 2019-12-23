@@ -110,11 +110,12 @@ public class PhantomJSController implements DataSupplier {
     }
 
     @Override
-    public void createStats() {
+    public List<Subject> createStats() {
         goToUserFrequency();
         goToStartMonth();
         List<Subject> completeSubjectList = aggregateData();
         sendSubjectSet(completeSubjectList);
+        return completeSubjectList;
     }
 
     private void sendSubjectSet(List<Subject> completeSubjectList) {
