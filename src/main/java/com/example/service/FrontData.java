@@ -30,8 +30,8 @@ public class FrontData {
 
     private void addFrequency() {
         for (Subject subject : subjectList) {
-            double positiveHours = subject.getObecny() + subject.getZwolnionyObecny();
-            double negativeHours = subject.getNieobecny() + subject.getNieobecnyUsprawiedliwiony() + subject.getZwolnienie();
+            double positiveHours = subject.getPresent() + subject.getExemptPresent();
+            double negativeHours = subject.getAbsent() + subject.getAbsentExcused() + subject.getExemption();
             double allMatterHours = positiveHours + negativeHours;
             double frequency;
             double formattedFrequency;

@@ -10,7 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Day {
 
-
     int DayOfMonth;
     List<Lesion> lesions = new ArrayList<>();
 
