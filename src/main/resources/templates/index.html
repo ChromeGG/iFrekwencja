@@ -7,23 +7,52 @@
     <link rel="stylesheet" type="text/css" th:href="@{css/style.css}"/>
     <title>Logowanie - iFrekwencja</title>
 </head>
+<!--<body class="d-flex justify-content-center align-items-center">-->
 <body>
-<h1>Welcome</h1>
+<!--<h1>Witaj na iFrekwencji by Adam Tkaczyk</h1>-->
 
 <form th:action="@{/ifrekwencja}" th:object="${user}" method="post">
-    <p>Nazwa szkoły:<input type="text" th:field="*{schoolName}"></p>
-    <p>Użytkownik:<input type="text" th:field="*{name}"></p>
-    <p>Hasło:<input type="password" th:field="*{password}"></p>
-    <p>Przepisz kod:<input type="text" th:field="*{captcha}"> <img
-            th:src="@{'data:image/jpeg;base64,'+${captchaImage}}"/></p>
-    <p>Zliczanie od: <input id="datefield" type="date" max="2020-06-21" th:field="*{sinceWhen}"></p>
-    <p>Zliczanie do: <input id="datefield2" type="date" min="2019-09-02" max="2020-06-21"
-                            th:attr="max=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" th:field="*{untilWhen}">
-    </p>
-    <p><input type="submit" value="Zaloguj"></p>
+    <div class="form-group row">
+        <label for="schoolName" class="col-sm-2 col-form-label">Nazwa szkoły:</label>
+        <div class="col-sm-2">
+            <input type="text" id="schoolName" class="form-control" th:field="*{schoolName}" placeholder="Nazwa szkoły">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="user" class="col-sm-2 col-form-label">Użytkownik:</label>
+        <div class="col-sm-2">
+            <input type="text" id="user" class="form-control" th:field="*{name}" placeholder="Użytkownik">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="password" class="col-sm-2 col-form-label">Hasło:</label>
+        <div class="col-sm-2">
+            <input type="password" id="password" class="form-control" th:field="*{password}" placeholder="Haslo">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="captcha" class="col-sm-2 col-form-label">Przepisz kod:</label>
+        <div class="col-sm-1">
+            <input type="text" id="captcha" class="form-control" th:field="*{captcha}" placeholder="captcha">
+        </div>
+        <img class="col-sm-1"
+             th:src="@{'data:image/jpeg;base64,'+${captchaImage}}" alt="captcha.png"/>
+    </div>
+    <div class="form-group row">
+        <label for="datefield" class="col-sm-2 col-form-label">Zliczanie od:</label>
+        <div>
+            <input class="form-control" id="datefield" type="date" max="2020-06-21" th:field="*{sinceWhen}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="datefield2" class="col-sm-2 col-form-label">Zliczanie do:</label>
+        <div class="col-sm-2">
+            <input id="datefield2" class="form-control" type="date" min="2019-09-02" max="2020-06-21"
+                   th:attr="max=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" th:field="*{untilWhen}">
+        </div>
+    </div>
+    <input class="btn btn-outline-primary" type="submit" value="Zaloguj">
 </form>
-
-<br>
 
 <script src="js/scripts.js"></script>
 </body>

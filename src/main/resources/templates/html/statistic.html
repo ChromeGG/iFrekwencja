@@ -24,13 +24,13 @@
     </tr>
     <tr th:each="subject:${subjectsList}">
         <td th:text="${subject.name}">nazwa</td>
-        <td th:text="${subject.obecny}">1</td>
-        <td th:text="${subject.zwolnionyObecny}">2</td>
-        <td th:text="${subject.nieobecny}">3</td>
-        <td th:text="${subject.nieobecnyUsprawiedliwiony}">4</td>
-        <td th:text="${subject.zwolnienie}">5</td>
-        <td th:text="${subject.spozniony}">6</td>
-        <td th:text="${subject.nieOdbylySie}">7</td>
+        <td th:text="${subject.present}">1</td>
+        <td th:text="${subject.getExemptPresent}">2</td>
+        <td th:text="${subject.getAbsent}">3</td>
+        <td th:text="${subject.getAbsentExcused}">4</td>
+        <td th:text="${subject.getExemption}">5</td>
+        <td th:text="${subject.getBelated}">6</td>
+        <td th:text="${subject.getNotHappen}">7</td>
         <td th:text="${subject.frequency}">8</td>
     </tr>
 

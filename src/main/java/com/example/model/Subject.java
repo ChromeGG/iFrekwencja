@@ -16,15 +16,15 @@ public class Subject {
     private double frequency;
 
     //positive
-    private int obecny = 0; //obecnosc_0
-    private int zwolnionyObecny = 0; //obecnosc_9
+    private int present = 0; //obecnosc_0
+    private int exemptPresent = 0; //obecnosc_9
 
     //negative
-    private int nieobecnyUsprawiedliwiony = 0; //obecnosc_1
-    private int nieobecny = 0; //obecnosc_3
-    private int zwolnienie = 0; //obecnosc_4
+    private int absentExcused = 0; //obecnosc_1
+    private int absent = 0; //obecnosc_3
+    private int exemption = 0; //obecnosc_4
 
     //neutral
-    private int spozniony = 0; //obecnosc_2
-    private int nieOdbylySie = 0; // obecnosc_5
+    private int belated = 0; //obecnosc_2
+    private int notHappen = 0; // obecnosc_5
 }

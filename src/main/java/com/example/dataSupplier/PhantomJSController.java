@@ -143,28 +143,28 @@ public class PhantomJSController implements DataSupplier {
 
                 switch (category) {
                     case 0:
-                        subject.setObecny(subject.getObecny() + 1);
+                        subject.setPresent(subject.getPresent() + 1);
                         break;
                     case 1:
-                        subject.setNieobecnyUsprawiedliwiony(subject.getNieobecnyUsprawiedliwiony() + 1);
+                        subject.setAbsentExcused(subject.getAbsentExcused() + 1);
                         break;
                     case 2:
-                        subject.setSpozniony(subject.getSpozniony() + 1);
+                        subject.setBelated(subject.getBelated() + 1);
                         break;
                     case 3:
-                        subject.setNieobecny(subject.getNieobecny() + 1);
+                        subject.setAbsent(subject.getAbsent() + 1);
                         break;
                     case 4:
-                        subject.setZwolnienie(subject.getZwolnienie() + 1);
+                        subject.setExemption(subject.getExemption() + 1);
                         break;
                     case 5:
-                        subject.setNieOdbylySie(subject.getNieOdbylySie() + 1);
+                        subject.setNotHappen(subject.getNotHappen() + 1);
                         break;
                     case 9:
-                        subject.setZwolnionyObecny(subject.getZwolnionyObecny() + 1);
+                        subject.setExemptPresent(subject.getExemptPresent() + 1);
                         break;
                     default:
-                        System.err.println("Cos sie zjebalo");
+                        System.err.println("Something goes wrong!");
 
                 }
             }
